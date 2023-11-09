@@ -50,7 +50,7 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        # FIXME
+        # FIXME +
         self.x += self.vx
         self.y -= self.vy
         self.vy -= g
@@ -71,7 +71,7 @@ class Ball:
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        # FIXME
+        # FIXME +
 
         if ((self.x-obj.x)**2+(self.y-obj.y)**2) < (self.r+obj.r)**2:
             return True
@@ -192,6 +192,7 @@ while not finished:
             target.live = 0
             target.hit()
             target.new_target()
+            print(target.points)
     gun.power_up()
 
 pygame.quit()
