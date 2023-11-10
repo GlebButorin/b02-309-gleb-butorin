@@ -26,6 +26,7 @@ def rnd(x,y):
     return(choice(range(x,y)))
 
 class Ball:
+    global balls
     def __init__(self, screen: pygame.Surface, x=40, y=450):
         """ Конструктор класса ball
 
@@ -40,7 +41,7 @@ class Ball:
         self.vx = 0
         self.vy = 0
         self.color = choice(GAME_COLORS)
-        self.live = 30
+        self.live = 60
 
     def move(self):
         global g
@@ -77,6 +78,17 @@ class Ball:
             return True
         else:
             return False
+
+
+    def wall_collide(self):
+        if self.x + self.r >= 800 or self.x - self.r <= 0:
+            self.vx = -self.vx
+        if self.y + self.r >= 600 or self.y - self.r <= 0:
+            self.vy = -self.vy
+    def checklive(self):
+        self.live -= 1
+        if self.live == 0:
+            balls.pop(0)
 
 
 class Gun:
@@ -193,7 +205,9 @@ while not finished:
             gun.targetting(event)
 
     for b in balls:
+        b.checklive()
         b.move()
+        b.wall_collide()
         if b.hittest(target) and target.live:
             target.live = 0
             target.hit()
