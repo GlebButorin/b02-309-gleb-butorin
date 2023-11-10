@@ -110,7 +110,7 @@ class Gun:
     def targetting(self, event):
         """Прицеливание. Зависит от положения мыши."""
         if event:
-            self.an = math.atan((event.pos[1]-450) / (event.pos[0]-20))
+            self.an = math.atan2((event.pos[1]-450), (event.pos[0]-20))
         if self.f2_on:
             self.color = RED
         else:
@@ -118,7 +118,13 @@ class Gun:
 
     def draw(self):
         # FIXIT don't know how to do it
-        pass
+        # pass
+        self.width = 10
+        self.length = 20 + self.f2_power
+        pygame.draw.polygon(self.screen, self.color, [(20, 450),
+                                                      (20+self.length*math.cos(self.an), 450+self.length*math.sin(self.an)),
+                                                      (20+self.length*math.cos(self.an)-self.width*math.sin(self.an), 450+self.length*math.sin(self.an)+self.width*math.cos(self.an)),
+                                                      (20-self.width*math.sin(self.an), 450+self.width*math.cos(self.an))])
 
     def power_up(self):
         if self.f2_on:
