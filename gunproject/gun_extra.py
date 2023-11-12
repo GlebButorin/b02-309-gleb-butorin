@@ -26,9 +26,9 @@ def rnd(x,y):
 
 
 class Ball:
-    global balls, bullet, next_ball
+    global balls, bullet
 
-    def __init__(self, screen: pygame.Surface, x=40, y=450):
+    def __init__(self,ball_type, screen: pygame.Surface, x=40, y=450):
         """ Конструктор класса ball
 
         Args:
@@ -38,15 +38,15 @@ class Ball:
         self.screen = screen
         self.x = x
         self.y = y
-        self.r = next_ball.r
+        self.r = ball_type.r
         self.vx = 0
         self.vy = 0
-        self.color = next_ball.color
-        self.live = next_ball.live_time
-        self.g = next_ball.g
-        self.f = next_ball.f
-        self.k_v = next_ball.k_v
-        self.type = next_ball.type
+        self.color = ball_type.color
+        self.live = ball_type.live_time
+        self.g = ball_type.g
+        self.f = ball_type.f
+        self.k_v = ball_type.k_v
+        self.type = ball_type.type
 
     def move(self):
         #global g
@@ -95,18 +95,34 @@ class Ball:
     def checklive(self):
         self.live -= 1
         if self.live <= 0:
+            self.check_dividing()
             for i in range(len(balls)-1, -1, -1):
                 if self == balls[i]:
                     balls.pop(i)
 
-
     def check_dividing(self):
+        global d2_v, d3_v
         #if self.type == d1:
-        pass
+        if self.type == 'd1':
+            for i in range(3):
+                new_ball = Ball(dividing2, self.screen, self.x, self.y)
+                an = i * math.pi * 2/3
+                new_ball.vx = self.vx + math.cos(an)*d2_v
+                new_ball.vy = self.vy + math.sin(an)*d2_v
+                balls.append(new_ball)
+        if self.type == 'd2':
+            for i in range(3):
+                new_ball = Ball(dividing3, self.screen, self.x, self.y)
+                an = i * math.pi * 2/3
+                new_ball.vx = self.vx + math.cos(an) * d3_v
+                new_ball.vy = self.vy + math.sin(an) * d3_v
+                balls.append(new_ball)
+
 
 
 
 class Gun:
+    global next_ball
     def __init__(self, screen):
         self.screen = screen
         self.f2_power = 10
@@ -125,7 +141,7 @@ class Gun:
         """
         global balls, num_bullets
         num_bullets += 1
-        new_ball = Ball(self.screen)
+        new_ball = Ball(next_ball, self.screen)
         #new_ball.r += 5 зачем это надо???
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an) * new_ball.k_v
@@ -261,6 +277,8 @@ dividing1 = Ball_type(BLUE,'d1',  40, 24, 1.5, 0.01, 1.0)
 dividing2 = Ball_type(BLUE,'d2',  40, 16, 1.5, 0.02, 1.0)
 dividing3 = Ball_type(BLUE, 'd3', 40, 8, 1.5, 0.02, 1.0)
 ball_types = [bouncy, heavy, normal, dividing1]
+d2_v = 15
+d3_v = 10
 
 
 
@@ -308,7 +326,6 @@ while not finished:
         target.wall_collide()
 
     for b in balls:
-        b.check_dividing()
         b.checklive()
         b.move()
         b.wall_collide()
