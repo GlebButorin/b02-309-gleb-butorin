@@ -58,8 +58,8 @@ class Ball:
         """
         # FIXME +
         self.x += self.vx
-        self.y -= self.vy
-        self.vy -= self.g + self.vy * self.f
+        self.y += self.vy
+        self.vy -= -self.g + self.vy * self.f
         self.vx -= self.vx * self.f
 
     def draw(self):
@@ -87,9 +87,9 @@ class Ball:
 
 
     def wall_collide(self):
-        if self.x + self.r >= 800 or self.x - self.r <= 0:
+        if self.x + self.r + self.vx * self.f >= 800 or self.x - self.r + self.vx * self.f <= 0:
             self.vx = -self.vx
-        if self.y + self.r >= 600 or self.y - self.r <= 0:
+        if self.y + self.r + self.vy * self.f + self.g >= 600 or self.y - self.r + self.vy * self.f <= 0:
             self.vy = -self.vy
 
     def checklive(self):
@@ -145,7 +145,7 @@ class Gun:
         #new_ball.r += 5 зачем это надо???
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an) * new_ball.k_v
-        new_ball.vy = - self.f2_power * math.sin(self.an) * new_ball.k_v
+        new_ball.vy = self.f2_power * math.sin(self.an) * new_ball.k_v
         balls.append(new_ball)
         self.f2_on = 0
         self.f2_power = 10
@@ -195,7 +195,7 @@ class Target:
         x = self.x = rnd(600, 780)
         y = self.y = rnd(300, 550)
         vy = self.vy = rnd(-20, 20)
-        r = self.r = rnd(2, 50)
+        r = self.r = rnd(10, 40)
         color = self.color = RED
 
     def hit(self):

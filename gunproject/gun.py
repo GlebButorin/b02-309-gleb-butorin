@@ -55,8 +55,8 @@ class Ball:
         """
         # FIXME +
         self.x += self.vx
-        self.y -= self.vy
-        self.vy -= g + self.vy * 0.02
+        self.y += self.vy
+        self.vy -= -g + self.vy * 0.02
         self.vx -= self.vx * 0.02
 
     def draw(self):
@@ -84,9 +84,9 @@ class Ball:
 
 
     def wall_collide(self):
-        if self.x + self.r >= 800 or self.x - self.r <= 0:
+        if self.x + self.r + self.vx * 0.02 >= 800 or self.x - self.r + self.vx * 0.02 <= 0:
             self.vx = -self.vx
-        if self.y + self.r >= 600 or self.y - self.r <= 0:
+        if self.y + self.r + self.vy * 0.02 + g >= 600 or self.y - self.r + self.vy * 0.02 <= 0:
             self.vy = -self.vy
 
     def checklive(self):
@@ -118,7 +118,7 @@ class Gun:
         new_ball.r += 5
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
-        new_ball.vy = - self.f2_power * math.sin(self.an)
+        new_ball.vy = self.f2_power * math.sin(self.an)
         balls.append(new_ball)
         self.f2_on = 0
         self.f2_power = 10
