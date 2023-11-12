@@ -25,8 +25,10 @@ g = 1
 def rnd(x,y):
     return(choice(range(x,y)))
 
+
 class Ball:
     global balls
+
     def __init__(self, screen: pygame.Surface, x=40, y=450):
         """ Конструктор класса ball
 
@@ -86,9 +88,10 @@ class Ball:
             self.vx = -self.vx
         if self.y + self.r >= 600 or self.y - self.r <= 0:
             self.vy = -self.vy
+
     def checklive(self):
         self.live -= 1
-        if self.live == 0:
+        if self.live <= 0:
             balls.pop(0)
 
 
@@ -163,6 +166,7 @@ class Target:
         """ Инициализация новой цели. """
         x = self.x = rnd(600, 780)
         y = self.y = rnd(300, 550)
+        vy = self.vy = rnd(-20, 20)
         r = self.r = rnd(2, 50)
         color = self.color = RED
 
@@ -191,6 +195,13 @@ class Target:
         self.live = 1
         bullet = 0
 
+    def move(self):
+        self.y += self.vy
+
+    def wall_collide(self):
+        if self.y + self.r >= 600 or self.y - self.r <= 0:
+            self.vy = -self.vy
+
     def draw(self):
         pygame.draw.circle(screen, BLACK, [self.x, self.y], self.r+1)
         pygame.draw.circle(screen, self.color, [self.x, self.y], self.r)
@@ -198,8 +209,10 @@ class Target:
 
 class Score:
     global points
-    def __init__(self, sreen):
+
+    def __init__(self, screen):
         self.text = pygame.font.SysFont('score', 72)
+
     def draw(self):
         img = self.text.render(str(points), True, BLUE)
         screen.blit(img, (20, 20))
@@ -239,6 +252,9 @@ while not finished:
             gun.fire2_end(event)
         elif event.type == pygame.MOUSEMOTION:
             gun.targetting(event)
+    for target in targets:
+        target.move()
+        target.wall_collide()
 
     for b in balls:
         b.checklive()
