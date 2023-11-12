@@ -16,11 +16,12 @@ CYAN = 0x00FFCC
 BLACK = (0, 0, 0)
 WHITE = 0xFFFFFF
 GREY = 0x7D7D7D
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+ORANGE = 0xFC6600
+GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN, ORANGE]
 
 WIDTH = 800
 HEIGHT = 600
-time = 30 #время игры в секундах
+time = 60 #время игры в секундах
 
 
 def rnd(x,y):
@@ -95,6 +96,7 @@ class Ball:
 
     def checklive(self):
         self.live -= 1
+        self.check_bomb()
         if self.live <= 0:
             self.check_dividing()
             for i in range(len(balls)-1, -1, -1):
@@ -118,6 +120,13 @@ class Ball:
                 new_ball.vx = self.vx + math.cos(an) * d3_v
                 new_ball.vy = self.vy + math.sin(an) * d3_v
                 balls.append(new_ball)
+
+    def check_bomb(self):
+        if self.type == 'bomb':
+            if self.live < bomb.live_time / 4:
+                self.vx = 0
+                self.vy = 0
+                self.r = 80
 
 
 
@@ -299,7 +308,8 @@ normal = Ball_type(YELLOW,'n',  90, 20, 1.5, 0.03, 1.0)
 dividing1 = Ball_type(BLUE,'d1',  40, 24, 1.5, 0.01, 1.0)
 dividing2 = Ball_type(BLUE,'d2',  40, 16, 1.5, 0.02, 1.0)
 dividing3 = Ball_type(BLUE, 'd3', 40, 8, 1.5, 0.02, 1.0)
-ball_types = [bouncy, heavy, normal, dividing1]
+bomb = Ball_type(ORANGE, 'bomb', 30, 10, 1.0, 0.02, 1.0)
+ball_types = [bouncy, heavy, normal, dividing1, bomb]
 d2_v = 15 / t_c
 d3_v = 10 / t_c
 
