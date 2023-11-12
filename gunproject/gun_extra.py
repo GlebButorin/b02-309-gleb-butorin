@@ -4,7 +4,8 @@ from random import choice
 import pygame
 
 
-FPS = 30
+FPS = 60
+t_c = FPS/30 #константа врмени
 
 RED = 0xFF0000
 BLUE = 0x0000FF
@@ -144,8 +145,8 @@ class Gun:
         new_ball = Ball(next_ball, self.screen)
         #new_ball.r += 5 зачем это надо???
         self.an = math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
-        new_ball.vx = self.f2_power * math.cos(self.an) * new_ball.k_v
-        new_ball.vy = self.f2_power * math.sin(self.an) * new_ball.k_v
+        new_ball.vx = self.f2_power * math.cos(self.an) * new_ball.k_v / t_c
+        new_ball.vy = self.f2_power * math.sin(self.an) * new_ball.k_v / t_c
         balls.append(new_ball)
         self.f2_on = 0
         self.f2_power = 10
@@ -173,7 +174,7 @@ class Gun:
     def power_up(self):
         if self.f2_on:
             if self.f2_power < 100:
-                self.f2_power += 1
+                self.f2_power += 1 / t_c
             self.color = RED
         else:
             self.color = GREY
@@ -194,7 +195,7 @@ class Target:
         """ Инициализация новой цели. """
         x = self.x = rnd(600, 780)
         y = self.y = rnd(300, 550)
-        vy = self.vy = rnd(-20, 20)
+        vy = self.vy = rnd(-20, 20) / t_c
         r = self.r = rnd(10, 40)
         color = self.color = RED
 
@@ -260,10 +261,10 @@ class Ball_type:
     def __init__(self, color, type, live_time, r, g, f, k_v):
         self.type = type
         self.color = color
-        self.live_time = live_time
+        self.live_time = live_time * t_c
         self.r = r
-        self.g = g #гравитация
-        self.f = f #трение
+        self.g = g / t_c**2 #гравитация
+        self.f = f / t_c #трение
         self.k_v = k_v #начальная скорость
 
 
@@ -291,6 +292,7 @@ def game_over():
     screen.blit(img, (290, 200))
     pygame.display.update()
 
+
 bouncy = Ball_type(GREEN, 'b', 150, 10, 0.5, 0, 1.5)
 heavy = Ball_type(BLACK, 'h', 90, 50, 2.5, 0.04, 0.8)
 normal = Ball_type(YELLOW,'n',  90, 20, 1.5, 0.03, 1.0)
@@ -298,8 +300,8 @@ dividing1 = Ball_type(BLUE,'d1',  40, 24, 1.5, 0.01, 1.0)
 dividing2 = Ball_type(BLUE,'d2',  40, 16, 1.5, 0.02, 1.0)
 dividing3 = Ball_type(BLUE, 'd3', 40, 8, 1.5, 0.02, 1.0)
 ball_types = [bouncy, heavy, normal, dividing1]
-d2_v = 15
-d3_v = 10
+d2_v = 15 / t_c
+d3_v = 10 / t_c
 
 
 
