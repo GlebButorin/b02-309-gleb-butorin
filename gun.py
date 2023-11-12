@@ -41,7 +41,7 @@ class Ball:
         self.vx = 0
         self.vy = 0
         self.color = choice(GAME_COLORS)
-        self.live = 60
+        self.live = 90
 
     def move(self):
         global g
@@ -54,7 +54,8 @@ class Ball:
         # FIXME +
         self.x += self.vx
         self.y -= self.vy
-        self.vy -= g
+        self.vy -= g + self.vy * 0.02
+        self.vx -= self.vx * 0.02
 
     def draw(self):
         pygame.draw.circle(
@@ -174,6 +175,13 @@ class Target:
     def draw(self):
         pygame.draw.circle(screen, self.color, [self.x, self.y], self.r)
 
+class Score:
+    global target
+    def __init__(self, sreen):
+        self.text = pygame.font.SysFont('score', 72)
+    def draw(self):
+        img = self.text.render(str(target.points), True, BLUE)
+        screen.blit(img, (20, 20))
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -183,12 +191,14 @@ balls = []
 clock = pygame.time.Clock()
 gun = Gun(screen)
 target = Target(screen)
+score = Score(screen)
 finished = False
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
     target.draw()
+    score.draw()
     for b in balls:
         b.draw()
     pygame.display.update()
@@ -212,7 +222,6 @@ while not finished:
             target.live = 0
             target.hit()
             target.new_target()
-            print(target.points)
     gun.power_up()
 
 pygame.quit()
