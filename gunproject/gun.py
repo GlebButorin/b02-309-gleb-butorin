@@ -130,7 +130,7 @@ class Gun:
             self.color = GREY
 
     def draw(self):
-        # FIXIT don't know how to do it
+        # FIXIT + don't know how to do it
         # pass
         self.width = 10
         self.length = 20 + self.f2_power
@@ -151,7 +151,7 @@ class Gun:
 class Target:
     # self.points = 0
     # self.live = 1
-    # FIXME: don't work!!! How to call this functions when object is created?
+    # FIXME + : don't work!!! How to call this functions when object is created?
     # self.new_target()
 
     def __init__(self, screen):
@@ -167,13 +167,29 @@ class Target:
         color = self.color = RED
 
     def hit(self, points=1):
+
+        global balls
+        global bullet
+
         """Попадание шарика в цель."""
         self.points += points
         self.new_target()
+        screen.fill(WHITE)
+        gun.draw()
+        score.draw()
+        for b in balls:
+            b.draw()
+        text1 = pygame.font.SysFont('score', 30)
+        img1 = text1.render('Вы уничтожили цель за ' + str(bullet) + ' выстрелов', True, 'BLUE')
+        screen.blit(img1, (200, 200))
+        pygame.display.update()
+        pygame.time.delay(1000)
         self.live = 1
+        bullet = 0
 
     def draw(self):
         pygame.draw.circle(screen, self.color, [self.x, self.y], self.r)
+
 
 class Score:
     global target
@@ -182,6 +198,7 @@ class Score:
     def draw(self):
         img = self.text.render(str(target.points), True, BLUE)
         screen.blit(img, (20, 20))
+
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
