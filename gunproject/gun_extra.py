@@ -19,6 +19,7 @@ GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 WIDTH = 800
 HEIGHT = 600
+time = 30 #время игры в секундах
 
 
 def rnd(x,y):
@@ -85,11 +86,10 @@ class Ball:
         else:
             return False
 
-
     def wall_collide(self):
-        if self.x + self.r + self.vx * self.f >= 800 or self.x - self.r + self.vx * self.f <= 0:
+        if self.x + self.r >= 800 and self.vx > 0 or self.x - self.r <= 0 and self.vx < 0:
             self.vx = -self.vx
-        if self.y + self.r + self.vy * self.f + self.g >= 600 or self.y - self.r + self.vy * self.f <= 0:
+        if self.y + self.r >= 600 and self.vy > 0 or self.y - self.r <= 0 and self.vy < 0:
             self.vy = -self.vy
 
     def checklive(self):
@@ -252,8 +252,9 @@ class Ball_text:
 
     def draw_next(self):
         img = self.text.render('Next:', True, BLACK)
-        screen.blit(img, (550, 20))
-        pygame.draw.circle(screen, next_ball.color, (650, 35), 15)
+        screen.blit(img, (580, 20))
+        pygame.draw.circle(screen, next_ball.color, (670, 35), 15)
+
 
 class Ball_type:
     def __init__(self, color, type, live_time, r, g, f, k_v):
@@ -265,13 +266,33 @@ class Ball_type:
         self.f = f #трение
         self.k_v = k_v #начальная скорость
 
+
 def def_next_ball():
     global next_ball
     next_ball = choice(ball_types)
 
+def timer():
+    global time
+    global time_is_up
+    text = pygame.font.SysFont(None, 36)
+    t0 = pygame.time.get_ticks()
+    t = time - int(t0/1000)
+    sec = t % 60
+    min = (t - sec) // 60
+    img = text.render('time left:     ' + str(min) + ':' + str(sec//10) + str(sec%10), True, BLACK)
+    screen.blit(img, (300, 20))
+
+    if t <= 0:
+        time_is_up = True
+
+def game_over():
+    text = pygame.font.SysFont('times new roman', 48)
+    img = text.render('GAME OVER', True, 'RED')
+    screen.blit(img, (290, 200))
+    pygame.display.update()
 
 bouncy = Ball_type(GREEN, 'b', 150, 10, 0.5, 0, 1.5)
-heavy = Ball_type(BLACK, 'h', 90, 30, 2.5, 0.04, 0.8)
+heavy = Ball_type(BLACK, 'h', 90, 50, 2.5, 0.04, 0.8)
 normal = Ball_type(YELLOW,'n',  90, 20, 1.5, 0.03, 1.0)
 dividing1 = Ball_type(BLUE,'d1',  40, 24, 1.5, 0.01, 1.0)
 dividing2 = Ball_type(BLUE,'d2',  40, 16, 1.5, 0.02, 1.0)
@@ -299,8 +320,9 @@ for i in range(2):
     targets.append(Target(screen))
 score = Score(screen)
 finished = False
+time_is_up = False
 
-while not finished:
+while not finished and not time_is_up:
     screen.fill(WHITE)
     gun.draw()
     for target in targets:
@@ -309,6 +331,7 @@ while not finished:
     ball_text.draw_next()
     for b in balls:
         b.draw()
+    timer()
     pygame.display.update()
 
     clock.tick(FPS)
@@ -335,5 +358,13 @@ while not finished:
                 target.hit()
                 target.new_target()
     gun.power_up()
+if time_is_up:
+    game_over()
+    while not finished:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finished = True
+
 
 pygame.quit()
