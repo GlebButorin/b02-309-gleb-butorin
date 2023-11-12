@@ -166,16 +166,20 @@ class Target:
         r = self.r = rnd(2, 50)
         color = self.color = RED
 
-    def hit(self, points=1):
+    def hit(self):
 
         global balls
         global bullet
+        global points
 
         """Попадание шарика в цель."""
-        self.points += points
+        points += 1
         self.new_target()
         screen.fill(WHITE)
         gun.draw()
+        for t in targets:
+            if t != self:
+                t.draw()
         score.draw()
         for b in balls:
             b.draw()
@@ -188,33 +192,38 @@ class Target:
         bullet = 0
 
     def draw(self):
+        pygame.draw.circle(screen, BLACK, [self.x, self.y], self.r+1)
         pygame.draw.circle(screen, self.color, [self.x, self.y], self.r)
 
 
 class Score:
-    global target
+    global points
     def __init__(self, sreen):
         self.text = pygame.font.SysFont('score', 72)
     def draw(self):
-        img = self.text.render(str(target.points), True, BLUE)
+        img = self.text.render(str(points), True, BLUE)
         screen.blit(img, (20, 20))
 
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 bullet = 0
+points = 0
 balls = []
+targets = []
 
 clock = pygame.time.Clock()
 gun = Gun(screen)
-target = Target(screen)
+for i in range(2):
+    targets.append(Target(screen))
 score = Score(screen)
 finished = False
 
 while not finished:
     screen.fill(WHITE)
     gun.draw()
-    target.draw()
+    for target in targets:
+        target.draw()
     score.draw()
     for b in balls:
         b.draw()
@@ -235,10 +244,11 @@ while not finished:
         b.checklive()
         b.move()
         b.wall_collide()
-        if b.hittest(target) and target.live:
-            target.live = 0
-            target.hit()
-            target.new_target()
+        for target in targets:
+            if b.hittest(target) and target.live:
+                target.live = 0
+                target.hit()
+                target.new_target()
     gun.power_up()
 
 pygame.quit()
